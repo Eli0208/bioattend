@@ -1,13 +1,15 @@
 import React from 'react';
 import { Flex, Box, Link, Spacer } from '@chakra-ui/react';
+import fpLogo from '../assets/fingerprint.png';
+import { Image } from '@chakra-ui/react';
 
 const Navbar = () => {
   return (
     <Flex p="4" bg="blue.500" color="white">
-      <Box p="2">
+      <Box>
         {/* Your logo or brand */}
         <Link href="/" fontWeight="bold">
-          HomeButton
+          <Image src={fpLogo} alt="logo" h="3vh" />
         </Link>
       </Box>
       <Spacer />

@@ -8,20 +8,22 @@ import {
   Button,
   Select,
 } from '@chakra-ui/react';
+import axios from 'axios';
+import Swal from 'sweetalert2';
 
 function Registration() {
   const [studentNo, setStudentNo] = useState('');
   const [studentFirstName, setStudentFirstName] = useState('');
   const [studentMiddleName, setStudentMiddleName] = useState('');
   const [studentLastName, setStudentLastName] = useState('');
-  const [year, setYear] = useState('');
-  const [section, setSection] = useState('');
+  const [year, setYear] = useState('First Year');
+  const [section, setSection] = useState('A');
   const [fingerprint, setFingerprint] = useState('');
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    // Handle form submission, you can send data to server or perform any other actions
-    console.log({
+
+    const formData = {
       studentNo,
       studentFirstName,
       studentMiddleName,
@@ -29,15 +31,49 @@ function Registration() {
       year,
       section,
       fingerprint,
-    });
-    // Reset form fields if needed
-    setStudentNo('');
-    setStudentFirstName('');
-    setStudentMiddleName('');
-    setStudentLastName('');
-    setYear('');
-    setSection('');
-    setFingerprint('');
+    };
+
+    try {
+      const response = await axios.post(
+        'http://localhost:4000/api/register',
+        JSON.stringify(formData),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      // Clear form fields
+      setStudentNo('');
+      setStudentFirstName('');
+      setStudentMiddleName('');
+      setStudentLastName('');
+      setYear('First Year');
+      setSection('A');
+      setFingerprint('');
+
+      // Show success message
+      Swal.fire({
+        icon: 'success',
+        title: 'Registration Successful!',
+        text: 'Your registration has been successfully submitted.',
+      });
+
+      console.log(response);
+    } catch (error) {
+      // Show error message
+      Swal.fire({
+        icon: 'error',
+        title: 'Registration Failed!',
+        text: 'There was a problem with the registration. Please try again later.',
+      });
+
+      console.error(
+        'There was a problem with the registration:',
+        error.message
+      );
+    }
   };
 
   return (

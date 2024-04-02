@@ -1,7 +1,11 @@
 import React from 'react';
-import { Box, Stack, Link, Text } from '@chakra-ui/react';
+import { Box, Stack, Link } from '@chakra-ui/react';
 
-function DatabasesSideBar() {
+function DatabasesSideBar({ setSelectedYear }) {
+  const handleYearClick = year => {
+    setSelectedYear(year);
+  };
+
   return (
     <Box
       as="nav"
@@ -16,16 +20,16 @@ function DatabasesSideBar() {
       marginTop="0.5vh"
     >
       <Stack spacing="4">
-        <Link href="#" fontSize="xl">
+        <Link fontSize="xl" onClick={() => handleYearClick('First Year')}>
           First Year
         </Link>
-        <Link href="#" fontSize="xl">
+        <Link fontSize="xl" onClick={() => handleYearClick('Second Year')}>
           Second Year
         </Link>
-        <Link href="#" fontSize="xl">
+        <Link fontSize="xl" onClick={() => handleYearClick('Third Year')}>
           Third Year
         </Link>
-        <Link href="#" fontSize="xl">
+        <Link fontSize="xl" onClick={() => handleYearClick('Fourth Year')}>
           Fourth Year
         </Link>
       </Stack>
