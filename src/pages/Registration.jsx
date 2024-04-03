@@ -35,7 +35,7 @@ function Registration() {
 
     try {
       const response = await axios.post(
-        'http://localhost:4000/api/register',
+        'http://localhost:5000/api/register',
         JSON.stringify(formData),
         {
           headers: {
