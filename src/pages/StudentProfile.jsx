@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Box,
   FormControl,
@@ -14,31 +14,63 @@ import {
   Button,
   useToast,
 } from '@chakra-ui/react';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 const StudentProfile = () => {
   const toast = useToast();
   const [formData] = useState({
-    studentName: 'John Doe',
-    studentID: '123456',
+    studentName: 'GERONIMO, REYNMAR LORENZ P.',
+    studentID: '2022314575',
   });
 
   const [attendanceRecords, setAttendanceRecords] = useState([
     {
-      date: '2024-04-05',
-      timeIn: '09:00 AM',
-      timeOut: '05:00 PM',
+      date: '2024-03-26',
+      timeIn: '08:37 AM',
+      timeOut: '10:00 AM',
+      remarks: 'Late',
+    },
+    {
+      date: '2024-03-26',
+      timeIn: '01:00 PM',
+      timeOut: '02:30 PM',
+      remarks: 'On-time',
+    },
+    {
+      date: '2024-04-01',
+      timeIn: '08:45 AM',
+      timeOut: '10:00 AM',
+      remarks: 'Late',
+    },
+    {
+      date: '2024-04-01',
+      timeIn: '12:28 PM',
+      timeOut: '03:00 PM',
+      remarks: 'On-time',
+    },
+    {
+      date: '2024-04-03',
+      timeIn: '09:15 AM',
+      timeOut: '10:45 AM',
+      remarks: 'On-time',
+    },
+    {
+      date: '2024-04-03',
+      timeIn: '01:30 PM',
+      timeOut: '03:00 PM',
+      remarks: 'Late',
+    },
+    {
+      date: '2024-04-04',
+      timeIn: '08:30 AM',
+      timeOut: '9:59 AM',
       remarks: 'On-time',
     },
     {
       date: '2024-04-04',
-      timeIn: '09:15 AM',
-      timeOut: '05:30 PM',
-      remarks: 'Late',
-    },
-    {
-      date: '2024-04-03',
-      timeIn: '08:45 AM',
-      timeOut: '04:45 PM',
+      timeIn: '11:28 PM',
+      timeOut: '12:45 PM',
       remarks: 'Early-out',
     },
   ]);
@@ -61,6 +93,33 @@ const StudentProfile = () => {
       duration: 3000,
       isClosable: true,
     });
+  };
+
+  const handleDownloadPDF = () => {
+    const pdf = new jsPDF();
+    const { studentName, studentID } = formData;
+
+    // Student information
+    pdf.text('Student Name: ' + studentName, 10, 10);
+    pdf.text('Student ID: ' + studentID, 10, 20);
+    pdf.text('Student Attendance Record', 10, 30);
+
+    // Attendance records
+    const columns = ['Date', 'Time In', 'Time Out', 'Remarks'];
+    const rows = attendanceRecords.map(record => [
+      record.date,
+      record.timeIn,
+      record.timeOut,
+      record.remarks,
+    ]);
+
+    pdf.autoTable({
+      startY: 40, // Start printing the table from Y-coordinate 40
+      head: [columns],
+      body: rows,
+    });
+
+    pdf.save('student_attendance_record.pdf');
   };
 
   return (
@@ -123,7 +182,12 @@ const StudentProfile = () => {
             ))}
           </Tbody>
         </Table>
-        <Button colorScheme="blue">Analytics</Button>
+        <Button colorScheme="blue" onClick={handleDownloadPDF}>
+          Download PDF
+        </Button>
+        <Button colorScheme="blue" ml={4}>
+          Analytics
+        </Button>
       </Box>
     </Box>
   );

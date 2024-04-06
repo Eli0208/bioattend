@@ -33,6 +33,7 @@ function DataBases() {
       try {
         const response = await axios.get('http://localhost:5000/api/students');
         setStudents(response.data);
+        console.log(students);
       } catch (error) {
         console.error('Error fetching students:', error.message);
       }

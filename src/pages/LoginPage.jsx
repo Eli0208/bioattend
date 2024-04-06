@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import {
   Box,
   FormControl,
@@ -10,7 +11,7 @@ import {
 } from '@chakra-ui/react';
 import bg from '../assets/WEBSITE.png';
 
-const LoginPage = () => {
+const LoginPage = ({ onLogin }) => {
   const toast = useToast();
   const [formData, setFormData] = useState({
     username: '',
@@ -22,18 +23,23 @@ const LoginPage = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    // Here you can perform authentication logic
-    if (formData.username === 'admin' && formData.password === 'password') {
+    try {
+      const response = await axios.post(
+        'http://localhost:5000/api/users/login',
+        formData
+      );
       // Authentication successful
+      localStorage.setItem('token', response.data.token); // Save token to local storage
+      onLogin(); // Notify parent component (App) of successful login
       toast({
         title: 'Login Successful',
         status: 'success',
         duration: 3000,
         isClosable: true,
       });
-    } else {
+    } catch (error) {
       // Authentication failed
       toast({
         title: 'Login Failed',
