@@ -2,7 +2,7 @@ import React from 'react';
 import { Flex, Box, Link, Spacer } from '@chakra-ui/react';
 import fpLogo from '../assets/fingerprint.png';
 import { Image } from '@chakra-ui/react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = ({ isLoggedIn, onLogout }) => {
   const navigate = useNavigate(); // Initialize navigate

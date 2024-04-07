@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import {
   Box,
   FormControl,
@@ -16,84 +17,83 @@ import {
 } from '@chakra-ui/react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import { useParams, useLocation } from 'react-router-dom';
+import moment from 'moment';
 
 const StudentProfile = () => {
   const toast = useToast();
-  const [formData] = useState({
-    studentName: 'GERONIMO, REYNMAR LORENZ P.',
-    studentID: '2022314575',
+  const { id } = useParams();
+  const location = useLocation();
+  const [formData, setFormData] = useState({
+    studentName: '',
+    studentID: '',
   });
+  const [attendanceRecords, setAttendanceRecords] = useState([]);
+  const [timeSlots, setTimeSlots] = useState([]);
+  const [matchingRecords, setMatchingRecords] = useState([]);
+  useEffect(() => {
+    setTimeSlots(location.state.timeSlots);
+    fetchStudentData();
+  }, [id, location]);
 
-  const [attendanceRecords, setAttendanceRecords] = useState([
-    {
-      date: '2024-03-26',
-      timeIn: '08:37 AM',
-      timeOut: '10:00 AM',
-      remarks: 'Late',
-    },
-    {
-      date: '2024-03-26',
-      timeIn: '01:00 PM',
-      timeOut: '02:30 PM',
-      remarks: 'On-time',
-    },
-    {
-      date: '2024-04-01',
-      timeIn: '08:45 AM',
-      timeOut: '10:00 AM',
-      remarks: 'Late',
-    },
-    {
-      date: '2024-04-01',
-      timeIn: '12:28 PM',
-      timeOut: '03:00 PM',
-      remarks: 'On-time',
-    },
-    {
-      date: '2024-04-03',
-      timeIn: '09:15 AM',
-      timeOut: '10:45 AM',
-      remarks: 'On-time',
-    },
-    {
-      date: '2024-04-03',
-      timeIn: '01:30 PM',
-      timeOut: '03:00 PM',
-      remarks: 'Late',
-    },
-    {
-      date: '2024-04-04',
-      timeIn: '08:30 AM',
-      timeOut: '9:59 AM',
-      remarks: 'On-time',
-    },
-    {
-      date: '2024-04-04',
-      timeIn: '11:28 PM',
-      timeOut: '12:45 PM',
-      remarks: 'Early-out',
-    },
-  ]);
-
-  const handleAttendanceSubmit = e => {
-    e.preventDefault();
-    // Assuming you have some logic to handle attendance submission
-    const currentDate = new Date().toLocaleDateString();
-    const currentTime = new Date().toLocaleTimeString();
-    const newRecord = {
-      date: currentDate,
-      timeIn: currentTime,
-      timeOut: '',
-      remarks: '',
-    };
-    setAttendanceRecords([...attendanceRecords, newRecord]);
-    toast({
-      title: 'Attendance Recorded',
-      status: 'success',
-      duration: 3000,
-      isClosable: true,
-    });
+  const fetchStudentData = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/${id}`);
+      const {
+        studentNo,
+        studentFirstName,
+        studentMiddleName,
+        studentLastName,
+        year,
+        section,
+      } = response.data;
+      const studentName = `${studentFirstName} ${
+        studentMiddleName ? studentMiddleName + ' ' : ''
+      }${studentLastName}`;
+      setFormData({ studentName, studentID: studentNo });
+      setAttendanceRecords(response.data.timeEntries);
+    } catch (error) {
+      console.error('Error fetching student data:', error);
+    }
   };
+
+  const isStudentPresent = (timeSlotStartTime, studentTimeIn) => {
+    const studentTime = moment(studentTimeIn).format('HH:mm');
+    const startTime = moment(timeSlotStartTime, 'HH:mm');
+    const studentMoment = moment(studentTime, 'HH:mm');
+    const startMinutes = startTime.hours() * 60 + startTime.minutes();
+    const studentMinutes = studentMoment.hours() * 60 + studentMoment.minutes();
+    const differenceInMinutes = Math.abs(startMinutes - studentMinutes);
+    return differenceInMinutes <= 60;
+  };
+
+  useEffect(() => {
+    // Iterate over time slots and attendance records to find matching records
+    const newMatchingRecords = [];
+
+    timeSlots.forEach(timeSlot => {
+      attendanceRecords.forEach(record => {
+        if (isStudentPresent(timeSlot.startTime, record.timeIn)) {
+          // Check if student is late
+          const studentTime = moment(record.timeIn).format('HH:mm');
+          const startTime = moment(timeSlot.startTime, 'HH:mm');
+          const studentMoment = moment(studentTime, 'HH:mm');
+          const startMinutes = startTime.hours() * 60 + startTime.minutes();
+          const studentMinutes =
+            studentMoment.hours() * 60 + studentMoment.minutes();
+          const differenceInMinutes = Math.abs(startMinutes - studentMinutes);
+
+          const remark = differenceInMinutes > 15 ? 'Late' : 'On-Time';
+
+          // Add the matching record with the remark
+          newMatchingRecords.push({ ...record, remark });
+        }
+      });
+    });
+
+    // Set matching records state
+    setMatchingRecords(newMatchingRecords);
+  }, [attendanceRecords, timeSlots]);
 
   const handleDownloadPDF = () => {
     const pdf = new jsPDF();
@@ -106,11 +106,11 @@ const StudentProfile = () => {
 
     // Attendance records
     const columns = ['Date', 'Time In', 'Time Out', 'Remarks'];
-    const rows = attendanceRecords.map(record => [
-      record.date,
-      record.timeIn,
-      record.timeOut,
-      record.remarks,
+    const rows = matchingRecords.map(record => [
+      moment(record.timeIn).format('MMMM DD, YYYY'), // Format date as "Month DD, YYYY"
+      moment(record.timeIn).format('hh:mm A'), // Format time as "hh:mm AM/PM"
+      moment(record.timeOut).format('hh:mm A'), // Format time as "hh:mm AM/PM"
+      record.remark,
     ]);
 
     pdf.autoTable({
@@ -138,46 +138,50 @@ const StudentProfile = () => {
         backgroundColor="rgba(255,255,255,0.8)"
       >
         <Heading mb={4}>Student Log</Heading>
-        <form onSubmit={handleAttendanceSubmit}>
-          <FormControl mb={4}>
-            <FormLabel htmlFor="studentName">Student Name</FormLabel>
-            <Input
-              id="studentName"
-              type="text"
-              placeholder="Enter student name"
-              name="studentName"
-              value={formData.studentName}
-              readOnly
-            />
-          </FormControl>
-          <FormControl mb={4}>
-            <FormLabel htmlFor="studentID">Student ID</FormLabel>
-            <Input
-              id="studentID"
-              type="text"
-              placeholder="Enter student ID"
-              name="studentID"
-              value={formData.studentID}
-              readOnly
-            />
-          </FormControl>
-        </form>
+        <FormControl mb={4}>
+          <FormLabel htmlFor="studentName">Student Name</FormLabel>
+          <Input
+            id="studentName"
+            type="text"
+            placeholder="Enter student name"
+            name="studentName"
+            value={formData.studentName}
+            readOnly
+          />
+        </FormControl>
+        <FormControl mb={4}>
+          <FormLabel htmlFor="studentID">Student ID</FormLabel>
+          <Input
+            id="studentID"
+            type="text"
+            placeholder="Enter student ID"
+            name="studentID"
+            value={formData.studentID}
+            readOnly
+          />
+        </FormControl>
         <Table variant="simple" mb={4}>
           <Thead>
             <Tr>
               <Th>Date</Th>
+              <Th>Room</Th>
               <Th>Time In</Th>
               <Th>Time Out</Th>
               <Th>Remarks</Th>
             </Tr>
           </Thead>
           <Tbody>
-            {attendanceRecords.map((record, index) => (
+            {matchingRecords?.map((record, index) => (
               <Tr key={index}>
-                <Td>{record.date}</Td>
-                <Td>{record.timeIn}</Td>
-                <Td>{record.timeOut}</Td>
-                <Td>{record.remarks}</Td>
+                <Td>{moment(record.timeIn).format('MMMM DD, YYYY')}</Td>
+                <Td>{record.room}</Td>
+                <Td>{moment(record.timeIn).format('hh:mm A')}</Td>
+                <Td>
+                  {record.timeOut
+                    ? moment(record.timeOut).format('hh:mm A')
+                    : '---------'}
+                </Td>
+                <Td>{record.remark}</Td>
               </Tr>
             ))}
           </Tbody>

@@ -56,7 +56,7 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/register" element={<Registration />} />
           <Route path="/databases" element={<DataBases />} />
-          <Route path="/student" element={<StudentProfile />} />
+          <Route path="/student/:id" element={<StudentProfile />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
           <Route path="/add" element={<AddClass />} />
           <Route path="/viewclass/:id" element={<ViewClass />} />

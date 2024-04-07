@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
   VStack,
@@ -29,6 +29,7 @@ const ViewClass = () => {
   const token = localStorage.getItem('token');
   const decodedToken = jwtDecode(token);
   const name = decodedToken.name;
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
@@ -61,6 +62,14 @@ const ViewClass = () => {
     console.log(`Enrolling student: ${student.name}`);
     // Close the modal after enrolling
     handleCloseModal();
+  };
+
+  // Function to handle viewing the log
+  const handleViewLog = (studentNo, timeSlots) => {
+    // Pass the necessary data to the log page when navigating
+    navigate(`/student/${studentNo}`, {
+      state: { timeSlots },
+    });
   };
 
   return (
@@ -127,7 +136,16 @@ const ViewClass = () => {
                   {student.studentLastName}
                 </Td>
                 <Td>
-                  <Button colorScheme="blue" size="sm">
+                  <Button
+                    colorScheme="blue"
+                    size="sm"
+                    onClick={() =>
+                      handleViewLog(
+                        student.studentNo,
+                        classData.class.timeSlots
+                      )
+                    }
+                  >
                     View Log
                   </Button>
                 </Td>
