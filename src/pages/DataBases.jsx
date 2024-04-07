@@ -116,7 +116,7 @@ function DataBases() {
         </Table>
         <Modal isOpen={isModalOpen} onClose={closeModal}>
           <ModalOverlay />
-          <ModalContent>
+          <ModalContent maxW="45vw">
             <ModalHeader>Student Details</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
@@ -134,6 +134,7 @@ function DataBases() {
                         <Th>Date</Th>
                         <Th>Time In</Th>
                         <Th>Time Out</Th>
+                        <Th>Room</Th>
                       </Tr>
                     </Thead>
                     <Tbody>
@@ -142,6 +143,7 @@ function DataBases() {
                           <Td>{formatDate(entry.timeIn)}</Td>
                           <Td>{formatTime(entry.timeIn)}</Td>
                           <Td>{formatTime(entry.timeOut)}</Td>
+                          <Td>{entry.room}</Td>
                         </Tr>
                       ))}
                     </Tbody>

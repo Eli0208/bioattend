@@ -19,8 +19,10 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { useParams, useLocation } from 'react-router-dom';
 import moment from 'moment';
+import { useNavigate } from 'react-router-dom';
 
 const StudentProfile = () => {
+  const navigate = useNavigate();
   const toast = useToast();
   const { id } = useParams();
   const location = useLocation();
@@ -70,27 +72,44 @@ const StudentProfile = () => {
   useEffect(() => {
     // Iterate over time slots and attendance records to find matching records
     const newMatchingRecords = [];
-
     timeSlots.forEach(timeSlot => {
+      console.log(timeSlot);
       attendanceRecords.forEach(record => {
         if (isStudentPresent(timeSlot.startTime, record.timeIn)) {
-          // Check if student is late
-          const studentTime = moment(record.timeIn).format('HH:mm');
-          const startTime = moment(timeSlot.startTime, 'HH:mm');
-          const studentMoment = moment(studentTime, 'HH:mm');
-          const startMinutes = startTime.hours() * 60 + startTime.minutes();
-          const studentMinutes =
-            studentMoment.hours() * 60 + studentMoment.minutes();
-          const differenceInMinutes = Math.abs(startMinutes - studentMinutes);
+          const date = new Date(record.timeIn);
+          const daysOfWeek = [
+            'Sunday',
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thursday',
+            'Friday',
+            'Saturday',
+          ];
+          const dayOfWeek = daysOfWeek[date.getDay()];
+          if (
+            timeSlot.dayOfWeek === dayOfWeek &&
+            timeSlot.room === record.room
+          ) {
+            const studentTime = moment(record.timeIn).format('HH:mm');
+            const startTime = moment(timeSlot.startTime, 'HH:mm');
+            const studentMoment = moment(studentTime, 'HH:mm');
+            const startMinutes = startTime.hours() * 60 + startTime.minutes();
+            const studentMinutes =
+              studentMoment.hours() * 60 + studentMoment.minutes();
+            const differenceInMinutes = Math.abs(startMinutes - studentMinutes);
 
-          const remark = differenceInMinutes > 15 ? 'Late' : 'On-Time';
+            const remark = differenceInMinutes > 15 ? 'Late' : 'On-Time';
 
-          // Add the matching record with the remark
-          newMatchingRecords.push({ ...record, remark });
+            // Add the matching record with the remark
+            newMatchingRecords.push({ ...record, remark });
+          }
         }
       });
+      newMatchingRecords.sort((a, b) => {
+        return new Date(a.timeIn) - new Date(b.timeIn);
+      });
     });
-
     // Set matching records state
     setMatchingRecords(newMatchingRecords);
   }, [attendanceRecords, timeSlots]);
@@ -120,6 +139,10 @@ const StudentProfile = () => {
     });
 
     pdf.save('student_attendance_record.pdf');
+  };
+
+  const handleAnalytics = () => {
+    navigate('/analytics', { state: { matchingRecords } });
   };
 
   return (
@@ -189,7 +212,7 @@ const StudentProfile = () => {
         <Button colorScheme="blue" onClick={handleDownloadPDF}>
           Download PDF
         </Button>
-        <Button colorScheme="blue" ml={4}>
+        <Button colorScheme="blue" ml={4} onClick={handleAnalytics}>
           Analytics
         </Button>
       </Box>
