@@ -88,7 +88,7 @@ const AddClass = ({ isOpen, onClose, onSubmit }) => {
       };
 
       const response = await axios.post(
-        'http://localhost:5000/api/users/addclass',
+        'http://192.168.0.100:5000/api/users/addclass',
         newClass
       );
       onSubmit(response.data); // Assuming the backend returns the added class

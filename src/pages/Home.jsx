@@ -30,7 +30,7 @@ function Home() {
 
       const username = decodedToken.username;
       axios
-        .get('http://localhost:5000/api/users/getclass', {
+        .get('http://192.168.0.100:5000/api/users/getclass', {
           params: { username: username },
         })
         .then(response => {

@@ -40,7 +40,7 @@ const StudentProfile = () => {
 
   const fetchStudentData = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/${id}`);
+      const response = await axios.get(`http://192.168.0.100:5000/api/${id}`);
       const {
         studentNo,
         studentFirstName,

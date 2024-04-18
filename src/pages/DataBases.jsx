@@ -31,7 +31,9 @@ function DataBases() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await axios.get('http://localhost:5000/api/students');
+        const response = await axios.get(
+          'http://192.168.0.100:5000/api/students'
+        );
         setStudents(response.data);
         console.log(students);
       } catch (error) {
