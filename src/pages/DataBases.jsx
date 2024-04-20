@@ -17,6 +17,7 @@ import {
   ModalCloseButton,
   Button,
   Text,
+  useBreakpointValue,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import DatabasesSideBar from '../components/DatabasesSideBar';
@@ -27,6 +28,7 @@ function DataBases() {
   const [selectedYear, setSelectedYear] = useState('First Year');
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const modalMaxWidth = useBreakpointValue({ base: '100vw', md: '45vw' });
 
   useEffect(() => {
     async function fetchData() {
@@ -35,7 +37,6 @@ function DataBases() {
           'http://192.168.0.100:5000/api/students'
         );
         setStudents(response.data);
-        console.log(students);
       } catch (error) {
         console.error('Error fetching students:', error.message);
       }
@@ -67,11 +68,13 @@ function DataBases() {
       hour12: true,
     });
   };
-
+  const boxWidth = useBreakpointValue({ base: '100%', md: '85%' });
+  const marginLeft = useBreakpointValue({ base: '0', md: '15%' });
+  const marginTop = useBreakpointValue({ base: '100px', md: '0' });
   return (
     <Flex>
       <DatabasesSideBar setSelectedYear={setSelectedYear} />
-      <Box w="100%">
+      <Box w={boxWidth} ml={marginLeft} mt={marginTop}>
         <Flex justifyContent="flex-end" mb={4}>
           <Select
             value={selectedSection}
@@ -83,42 +86,44 @@ function DataBases() {
             <option value="C">C</option>
           </Select>
         </Flex>
-        <Table variant="simple">
-          <Thead>
-            <Tr>
-              <Th>Student No.</Th>
-              <Th>First Name</Th>
-              <Th>Middle Name</Th>
-              <Th>Last Name</Th>
-              <Th>Year</Th>
-              <Th>Section</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {students
-              .filter(
-                student =>
-                  student.section === selectedSection &&
-                  student.year === selectedYear
-              )
-              .map(student => (
-                <Tr
-                  key={student._id}
-                  onClick={() => handleStudentClick(student)}
-                >
-                  <Td>{student.studentNo}</Td>
-                  <Td>{student.studentFirstName}</Td>
-                  <Td>{student.studentMiddleName}</Td>
-                  <Td>{student.studentLastName}</Td>
-                  <Td>{student.year}</Td>
-                  <Td>{student.section}</Td>
-                </Tr>
-              ))}
-          </Tbody>
-        </Table>
+        <Box overflowX="auto">
+          <Table variant="simple">
+            <Thead>
+              <Tr>
+                <Th>Student No.</Th>
+                <Th>First Name</Th>
+                <Th>Middle Name</Th>
+                <Th>Last Name</Th>
+                <Th>Year</Th>
+                <Th>Section</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {students
+                .filter(
+                  student =>
+                    student.section === selectedSection &&
+                    student.year === selectedYear
+                )
+                .map(student => (
+                  <Tr
+                    key={student._id}
+                    onClick={() => handleStudentClick(student)}
+                  >
+                    <Td>{student.studentNo}</Td>
+                    <Td>{student.studentFirstName}</Td>
+                    <Td>{student.studentMiddleName}</Td>
+                    <Td>{student.studentLastName}</Td>
+                    <Td>{student.year}</Td>
+                    <Td>{student.section}</Td>
+                  </Tr>
+                ))}
+            </Tbody>
+          </Table>
+        </Box>
         <Modal isOpen={isModalOpen} onClose={closeModal}>
           <ModalOverlay />
-          <ModalContent maxW="45vw">
+          <ModalContent maxW={modalMaxWidth}>
             <ModalHeader>Student Details</ModalHeader>
             <ModalCloseButton />
             <ModalBody>

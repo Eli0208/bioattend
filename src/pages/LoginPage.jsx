@@ -53,21 +53,25 @@ const LoginPage = ({ onLogin }) => {
 
   return (
     <Box
-      height="94vh"
+      height="100vh"
       background={`url(${bg}) no-repeat center center fixed`}
       backgroundSize="cover"
-      pt={250}
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
     >
       <Box
         p={8}
         maxWidth="400px"
+        width="90%"
         borderWidth={1}
         borderRadius={8}
         boxShadow="lg"
-        ml={1300}
-        backgroundColor="rgba(255,255,255,0.8)" // Adjust the opacity if needed
+        backgroundColor="rgba(255,255,255,0.8)"
       >
-        <Heading mb={4}>Login</Heading>
+        <Heading mb={4} textAlign="center">
+          Login
+        </Heading>
         <form onSubmit={handleSubmit}>
           <FormControl mb={4}>
             <FormLabel>Username</FormLabel>

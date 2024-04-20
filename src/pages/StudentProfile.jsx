@@ -183,32 +183,34 @@ const StudentProfile = () => {
             readOnly
           />
         </FormControl>
-        <Table variant="simple" mb={4}>
-          <Thead>
-            <Tr>
-              <Th>Date</Th>
-              <Th>Room</Th>
-              <Th>Time In</Th>
-              <Th>Time Out</Th>
-              <Th>Remarks</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {matchingRecords?.map((record, index) => (
-              <Tr key={index}>
-                <Td>{moment(record.timeIn).format('MMMM DD, YYYY')}</Td>
-                <Td>{record.room}</Td>
-                <Td>{moment(record.timeIn).format('hh:mm A')}</Td>
-                <Td>
-                  {record.timeOut
-                    ? moment(record.timeOut).format('hh:mm A')
-                    : '---------'}
-                </Td>
-                <Td>{record.remark}</Td>
+        <Box overflowX="auto">
+          <Table variant="simple" mb={4}>
+            <Thead>
+              <Tr>
+                <Th>Date</Th>
+                <Th>Room</Th>
+                <Th>Time In</Th>
+                <Th>Time Out</Th>
+                <Th>Remarks</Th>
               </Tr>
-            ))}
-          </Tbody>
-        </Table>
+            </Thead>
+            <Tbody>
+              {matchingRecords?.map((record, index) => (
+                <Tr key={index}>
+                  <Td>{moment(record.timeIn).format('MMMM DD, YYYY')}</Td>
+                  <Td>{record.room}</Td>
+                  <Td>{moment(record.timeIn).format('hh:mm A')}</Td>
+                  <Td>
+                    {record.timeOut
+                      ? moment(record.timeOut).format('hh:mm A')
+                      : '---------'}
+                  </Td>
+                  <Td>{record.remark}</Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </Box>
         <Button colorScheme="blue" onClick={handleDownloadPDF}>
           Download PDF
         </Button>

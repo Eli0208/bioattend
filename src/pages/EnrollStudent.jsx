@@ -9,6 +9,9 @@ import {
   Td,
   Button,
   Select,
+  Box,
+  Center,
+  Spinner,
 } from '@chakra-ui/react';
 import { jwtDecode } from 'jwt-decode';
 
@@ -16,6 +19,7 @@ function EnrollStudent({ onEnroll, classId }) {
   const [students, setStudents] = useState([]);
   const [selectedYear, setSelectedYear] = useState('');
   const [selectedSection, setSelectedSection] = useState('');
+  const [loading, setLoading] = useState(false);
   const token = localStorage.getItem('token');
   const decodedToken = jwtDecode(token);
   const username = decodedToken.username;
@@ -26,16 +30,22 @@ function EnrollStudent({ onEnroll, classId }) {
   }, [selectedYear, selectedSection]);
 
   const fetchStudents = () => {
+    // Set loading to true before making the request
+    setLoading(true);
     // Fetch students from the database based on selected year and section
     axios
       .get(
         `http://192.168.0.100:5000/api/studentsection?year=${selectedYear}&section=${selectedSection}`
       )
       .then(response => {
-        setStudents(response.data); // Assuming the response contains an array of student objects
+        setStudents(response.data);
       })
       .catch(error => {
         console.error('Error fetching students:', error);
+      })
+      .finally(() => {
+        // Set loading to false after the request is completed
+        setLoading(false);
       });
   };
 
@@ -59,6 +69,8 @@ function EnrollStudent({ onEnroll, classId }) {
       })
       .then(response => {
         console.log('Student enrolled successfully');
+        // If enrollment is successful, refetch the student data to update the list
+        fetchStudents();
       })
       .catch(error => {
         console.error('Error enrolling student:', error);
@@ -90,38 +102,48 @@ function EnrollStudent({ onEnroll, classId }) {
           {/* Add more options as needed */}
         </Select>
       </div>
-      <Table variant="simple">
-        <Thead>
-          <Tr>
-            <Th>Student No.</Th>
-            <Th>Student First Name</Th>
-            <Th>Student Last Name</Th>
-            <Th>Year</Th>
-            <Th>Section</Th>
-            <Th>Enroll</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {students.map(student => (
-            <Tr key={student.id}>
-              <Td>{student.studentNo}</Td>
-              <Td>{student.studentFirstName}</Td>
-              <Td>{student.studentLastName}</Td>
-              <Td>{student.year}</Td>
-              <Td>{student.section}</Td>
-              <Td>
-                <Button
-                  colorScheme="blue"
-                  size="sm"
-                  onClick={() => handleEnroll(student)}
-                >
-                  Enroll
-                </Button>
-              </Td>
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
+      {loading ? (
+        <Center>
+          <Spinner size="lg" />
+        </Center>
+      ) : students.length === 0 ? (
+        <Center>No students found.</Center>
+      ) : (
+        <Box overflowX="auto">
+          <Table variant="simple" width="100%">
+            <Thead>
+              <Tr>
+                <Th>Student No.</Th>
+                <Th>Student First Name</Th>
+                <Th>Student Last Name</Th>
+                <Th>Year</Th>
+                <Th>Section</Th>
+                <Th>Enroll</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {students.map(student => (
+                <Tr key={student.id}>
+                  <Td>{student.studentNo}</Td>
+                  <Td>{student.studentFirstName}</Td>
+                  <Td>{student.studentLastName}</Td>
+                  <Td>{student.year}</Td>
+                  <Td>{student.section}</Td>
+                  <Td>
+                    <Button
+                      colorScheme="blue"
+                      size="sm"
+                      onClick={() => handleEnroll(student)}
+                    >
+                      Enroll
+                    </Button>
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </Box>
+      )}
     </div>
   );
 }

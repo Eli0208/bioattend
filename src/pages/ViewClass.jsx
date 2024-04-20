@@ -18,6 +18,8 @@ import {
   ModalHeader,
   ModalCloseButton,
   ModalBody,
+  Box,
+  Flex,
 } from '@chakra-ui/react';
 import { jwtDecode } from 'jwt-decode';
 import EnrollStudent from './EnrollStudent';
@@ -26,6 +28,7 @@ const ViewClass = () => {
   const { id } = useParams();
   const [classData, setClassData] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [enrolledStudents, setEnrolledStudents] = useState([]);
   const token = localStorage.getItem('token');
   const decodedToken = jwtDecode(token);
   const name = decodedToken.name;
@@ -36,6 +39,7 @@ const ViewClass = () => {
       .get(`http://192.168.0.100:5000/api/users/class?classId=${id}`)
       .then(response => {
         setClassData(response.data);
+        setEnrolledStudents(response.data?.class?.enrolledStudents || []);
       })
       .catch(error => {
         console.error('Error fetching class data:', error);
@@ -62,6 +66,11 @@ const ViewClass = () => {
     console.log(`Enrolling student: ${student.name}`);
     // Close the modal after enrolling
     handleCloseModal();
+    // Update the enrolled students list
+    setEnrolledStudents(prevEnrolledStudents => [
+      ...prevEnrolledStudents,
+      student,
+    ]);
   };
 
   // Function to handle viewing the log
@@ -73,7 +82,7 @@ const ViewClass = () => {
   };
 
   return (
-    <HStack spacing={10}>
+    <Flex direction={{ base: 'column', md: 'row' }} spacing={10}>
       <VStack ml={3} mt={3} spacing={4} align="start">
         <HStack>
           <Text fontWeight="bold">Instructor:</Text>
@@ -91,83 +100,86 @@ const ViewClass = () => {
         </HStack>
 
         <Text fontWeight="bold">Time Slots:</Text>
-        <Table variant="simple" width="30vw">
-          <Thead>
-            <Tr>
-              <Th>Day</Th>
-              <Th>Start Time</Th>
-              <Th>End Time</Th>
-              <Th>Room</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {classData?.class?.timeSlots?.map((slot, index) => (
-              <Tr key={index}>
-                <Td>{slot.dayOfWeek}</Td>
-                <Td>{slot.startTime}</Td>
-                <Td>{slot.endTime}</Td>
-                <Td>{slot.room}</Td>
+        <Box overflowX="auto">
+          <Table variant="simple" width="100%">
+            <Thead>
+              <Tr>
+                <Th>Day</Th>
+                <Th>Start Time</Th>
+                <Th>End Time</Th>
+                <Th>Room</Th>
               </Tr>
-            ))}
-          </Tbody>
-          <Button colorScheme="blue" mt={3} onClick={handleOpenModal}>
-            Enroll Student
-          </Button>
-        </Table>
+            </Thead>
+            <Tbody>
+              {classData?.class?.timeSlots?.map((slot, index) => (
+                <Tr key={index}>
+                  <Td>{slot.dayOfWeek}</Td>
+                  <Td>{slot.startTime}</Td>
+                  <Td>{slot.endTime}</Td>
+                  <Td>{slot.room}</Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </Box>
+        <Button colorScheme="blue" mt={3} onClick={handleOpenModal}>
+          Enroll Student
+        </Button>
       </VStack>
 
       {/* Student list */}
-      <VStack spacing={4} align="start">
-        <Text fontWeight="bold">Enrolled Students:</Text>
-        <Table variant="striped" width="60vw">
-          <Thead>
-            <Tr>
-              <Th>Student No.</Th>
-              <Th>Student Name</Th>
-              <Th></Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {classData?.class?.enrolledStudents?.map((student, index) => (
-              <Tr key={index}>
-                <Td>{student.studentNo}</Td>
-                <Td>
-                  {student.studentFirstName} {student.studentMiddleName}{' '}
-                  {student.studentLastName}
-                </Td>
-                <Td>
-                  <Button
-                    colorScheme="blue"
-                    size="sm"
-                    onClick={() =>
-                      handleViewLog(
-                        student.studentNo,
-                        classData.class.timeSlots
-                      )
-                    }
-                  >
-                    View Log
-                  </Button>
-                </Td>
+      <Box overflowX="auto" mt={{ base: '4', md: '0' }}>
+        <VStack spacing={4} align="start">
+          <Text fontWeight="bold">Enrolled Students:</Text>
+          <Table variant="striped" width="60vw">
+            <Thead>
+              <Tr>
+                <Th>Student No.</Th>
+                <Th>Student Name</Th>
+                <Th></Th>
               </Tr>
-            ))}
-          </Tbody>
-        </Table>
-      </VStack>
+            </Thead>
+            <Tbody>
+              {enrolledStudents.map((student, index) => (
+                <Tr key={index}>
+                  <Td>{student.studentNo}</Td>
+                  <Td>
+                    {student.studentFirstName} {student.studentMiddleName}{' '}
+                    {student.studentLastName}
+                  </Td>
+                  <Td>
+                    <Button
+                      colorScheme="blue"
+                      size="sm"
+                      onClick={() =>
+                        handleViewLog(
+                          student.studentNo,
+                          classData.class.timeSlots
+                        )
+                      }
+                    >
+                      View Log
+                    </Button>
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </VStack>
+      </Box>
 
       {/* Enroll Student Modal */}
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
         <ModalOverlay />
-        <ModalContent maxW="50vw">
+        <ModalContent maxW={{ base: '100vw', md: '50vw' }}>
           <ModalHeader>Enroll Student</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {/* Render the EnrollStudent component inside the modal */}
             <EnrollStudent onEnroll={handleEnrollStudent} classId={id} />
           </ModalBody>
         </ModalContent>
       </Modal>
-    </HStack>
+    </Flex>
   );
 };
 
