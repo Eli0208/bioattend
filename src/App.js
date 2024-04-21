@@ -11,6 +11,7 @@ import AnalyticsPage from './pages/AnalyticsPage';
 import axios from 'axios';
 import AddClass from './pages/AddClass';
 import ViewClass from './pages/ViewClass';
+import RegisterProfPage from './pages/RegisterProfPage';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -60,6 +61,7 @@ function App() {
           <Route path="/analytics" element={<AnalyticsPage />} />
           <Route path="/add" element={<AddClass />} />
           <Route path="/viewclass/:id" element={<ViewClass />} />
+          <Route path="/regprof" element={<RegisterProfPage />} />
         </Routes>
       </BrowserRouter>
     </ChakraProvider>
