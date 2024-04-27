@@ -30,6 +30,9 @@ const Navbar = ({ isLoggedIn, onLogout }) => {
             <Link href="/register" p="2">
               Registration
             </Link>
+            <Link href="/regprof" p="2">
+              Register Instructor
+            </Link>
             <Link onClick={handleLogout} cursor="pointer" p="2">
               {' '}
               {/* Use handleLogout for logout */}

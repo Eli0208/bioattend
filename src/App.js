@@ -12,6 +12,7 @@ import axios from 'axios';
 import AddClass from './pages/AddClass';
 import ViewClass from './pages/ViewClass';
 import RegisterProfPage from './pages/RegisterProfPage';
+import EditPage from './pages/EditPage';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -62,6 +63,7 @@ function App() {
           <Route path="/add" element={<AddClass />} />
           <Route path="/viewclass/:id" element={<ViewClass />} />
           <Route path="/regprof" element={<RegisterProfPage />} />
+          <Route path="/edit/:id" element={<EditPage />} />
         </Routes>
       </BrowserRouter>
     </ChakraProvider>

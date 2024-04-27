@@ -21,6 +21,7 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 import DatabasesSideBar from '../components/DatabasesSideBar';
+import { Link } from 'react-router-dom';
 
 function DataBases() {
   const [students, setStudents] = useState([]);
@@ -129,12 +130,16 @@ function DataBases() {
             <ModalBody>
               {selectedStudent && (
                 <Box>
+                  {console.log(selectedStudent._id)}
                   <Text>ID: {selectedStudent.studentNo}</Text>
                   <Text>First Name: {selectedStudent.studentFirstName}</Text>
                   <Text>Middle Name: {selectedStudent.studentMiddleName}</Text>
                   <Text>Last Name: {selectedStudent.studentLastName}</Text>
                   <Text>Year: {selectedStudent.year}</Text>
                   <Text>Section: {selectedStudent.section}</Text>
+                  <Button as={Link} to={`/edit/${selectedStudent.studentNo}`}>
+                    Edit
+                  </Button>
                   <Table variant="simple">
                     <Thead>
                       <Tr>
