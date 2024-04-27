@@ -36,7 +36,7 @@ const ViewClass = () => {
 
   useEffect(() => {
     axios
-      .get(`http://192.168.0.100:5000/api/users/class?classId=${id}`)
+      .get(`http://localhost:5000/api/users/class?classId=${id}`)
       .then(response => {
         setClassData(response.data);
         setEnrolledStudents(response.data?.class?.enrolledStudents || []);

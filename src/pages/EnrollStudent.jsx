@@ -35,7 +35,7 @@ function EnrollStudent({ onEnroll, classId }) {
     // Fetch students from the database based on selected year and section
     axios
       .get(
-        `http://192.168.0.100:5000/api/studentsection?year=${selectedYear}&section=${selectedSection}`
+        `http://localhost:5000/api/studentsection?year=${selectedYear}&section=${selectedSection}`
       )
       .then(response => {
         setStudents(response.data);
@@ -59,7 +59,7 @@ function EnrollStudent({ onEnroll, classId }) {
 
     // Make a POST request to enroll the student
     axios
-      .post(`http://192.168.0.100:5000/api/users/enroll`, {
+      .post(`http://localhost:5000/api/users/enroll`, {
         classId: classId,
         studentNo: student.studentNo,
         username: username,

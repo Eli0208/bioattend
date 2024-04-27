@@ -19,7 +19,7 @@ const RegisterProfPage = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        'http://192.168.0.100:5000/api/users/register',
+        'http://localhost:5000/api/users/register',
         formData
       );
       Swal.fire({

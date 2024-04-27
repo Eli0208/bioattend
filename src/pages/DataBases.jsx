@@ -34,9 +34,7 @@ function DataBases() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await axios.get(
-          'http://192.168.0.100:5000/api/students'
-        );
+        const response = await axios.get('http://localhost:5000/api/students');
         setStudents(response.data);
       } catch (error) {
         console.error('Error fetching students:', error.message);
@@ -69,9 +67,26 @@ function DataBases() {
       hour12: true,
     });
   };
+
+  const handleDelete = async () => {
+    try {
+      await axios.delete(
+        `http://localhost:5000/api/deletestudent/${selectedStudent._id}`
+      );
+      const updatedStudents = students.filter(
+        student => student._id !== selectedStudent._id
+      );
+      setStudents(updatedStudents);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error('Error deleting student:', error);
+    }
+  };
+
   const boxWidth = useBreakpointValue({ base: '100%', md: '85%' });
   const marginLeft = useBreakpointValue({ base: '0', md: '15%' });
   const marginTop = useBreakpointValue({ base: '100px', md: '0' });
+
   return (
     <Flex>
       <DatabasesSideBar setSelectedYear={setSelectedYear} />
@@ -130,7 +145,6 @@ function DataBases() {
             <ModalBody>
               {selectedStudent && (
                 <Box>
-                  {console.log(selectedStudent._id)}
                   <Text>ID: {selectedStudent.studentNo}</Text>
                   <Text>First Name: {selectedStudent.studentFirstName}</Text>
                   <Text>Middle Name: {selectedStudent.studentMiddleName}</Text>
@@ -139,6 +153,9 @@ function DataBases() {
                   <Text>Section: {selectedStudent.section}</Text>
                   <Button as={Link} to={`/edit/${selectedStudent.studentNo}`}>
                     Edit
+                  </Button>
+                  <Button ml={2} onClick={handleDelete}>
+                    Delete
                   </Button>
                   <Table variant="simple">
                     <Thead>

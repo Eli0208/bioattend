@@ -28,7 +28,7 @@ const EditPage = () => {
   useEffect(() => {
     const fetchStudent = async () => {
       try {
-        const response = await axios.get(`http://192.168.0.100:5000/api/${id}`);
+        const response = await axios.get(`http://localhost:5000/api/${id}`);
         setStudent(response.data);
       } catch (error) {
         console.error('Error fetching student:', error);
@@ -50,7 +50,7 @@ const EditPage = () => {
     e.preventDefault();
     try {
       await axios.put(
-        `http://192.168.0.100:5000/api/editstudent/${student._id}`,
+        `http://localhost:5000/api/editstudent/${student._id}`,
         student
       );
       // Show success message
